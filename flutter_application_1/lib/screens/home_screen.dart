@@ -8,7 +8,28 @@ class HomeScreen extends StatefulWidget {
   @override
   State<HomeScreen> createState() => _HomeScreenState();
 }
+
 class _HomeScreenState extends State<HomeScreen> {
+  final _formKey = GlobalKey<FormState>();
+
+  final _timeSleepController = TextEditingController();
+  final _timeWakeController = TextEditingController();
+  @override
+  void dispose() {
+    _timeSleepController.dispose();
+    _timeWakeController.dispose();
+    super.dispose();
+  }
+
+  void _submitForm() {
+    if (_formKey.currentState!.validate()) {
+      final timeSleep = _timeSleepController.text;
+      final timeWake = _timeWakeController.text;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Данные сохранены: $timeSleep, $timeWake')),
+      );
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -58,44 +79,76 @@ class _HomeScreenState extends State<HomeScreen> {
           child: Column(
             children: [
               TableCalendar(
-                headerStyle: HeaderStyle(titleCentered: true, formatButtonVisible: false),
+                headerStyle: HeaderStyle(
+                  titleCentered: true,
+                  formatButtonVisible: false,
+                ),
                 firstDay: DateTime.utc(2010, 10, 16),
                 lastDay: DateTime.utc(2030, 3, 14),
                 focusedDay: DateTime.now(),
               ),
-              TextFormField(
-                decoration: InputDecoration(
-                  filled: true,
-                  fillColor: Color.fromARGB(255, 233, 233, 233),
-                  enabledBorder: OutlineInputBorder(
-                    borderSide: BorderSide(
-                      color: Color.fromARGB(255, 121, 121, 121),
+              Form(
+                key: _formKey,
+                child: Column(
+                  children: [
+                    TextFormField(
+                      validator: (value) {
+                        if (value == null || value.isEmpty) {
+                          return 'Введите время засыпания';
+                        } else if (!value.contains(':')) {
+                          return 'Неверный формат времени';
+                        }
+                        return null;
+                      },
+                      controller: _timeSleepController,
+                      decoration: InputDecoration(
+                        filled: true,
+                        fillColor: Color.fromARGB(255, 233, 233, 233),
+                        enabledBorder: OutlineInputBorder(
+                          borderSide: BorderSide(
+                            color: Color.fromARGB(255, 121, 121, 121),
+                          ),
+                        ),
+                        focusedBorder: OutlineInputBorder(
+                          borderSide: BorderSide(
+                            color: Color.fromARGB(255, 54, 54, 54),
+                          ),
+                        ),
+                        hintText: "Введите время пробуждения",
+                      ),
                     ),
-                  ),
-                  focusedBorder: OutlineInputBorder(
-                    borderSide: BorderSide(
-                      color: Color.fromARGB(255, 54, 54, 54),
+                    SizedBox(height: 10),
+                    TextFormField(
+                      validator: (value) {
+                        if (value == null || value.isEmpty) {
+                          return 'Введите время засыпания';
+                        } else if (!value.contains(':')) {
+                          return 'Неверный формат времени';
+                        }
+                        return null;
+                      },
+                      controller: _timeWakeController,
+                      decoration: InputDecoration(
+                        filled: true,
+                        fillColor: Color.fromARGB(255, 233, 233, 233),
+                        enabledBorder: OutlineInputBorder(
+                          borderSide: BorderSide(
+                            color: Color.fromARGB(255, 121, 121, 121),
+                          ),
+                        ),
+                        focusedBorder: OutlineInputBorder(
+                          borderSide: BorderSide(
+                            color: Color.fromARGB(255, 54, 54, 54),
+                          ),
+                        ),
+                        hintText: "Введите время засыпания",
+                      ),
                     ),
-                  ),
-                  hintText: "Введите время пробуждения",
-                ),
-              ),
-              SizedBox(height: 10),
-              TextFormField(
-                decoration: InputDecoration(
-                  filled: true,
-                  fillColor: Color.fromARGB(255, 233, 233, 233),
-                  enabledBorder: OutlineInputBorder(
-                    borderSide: BorderSide(
-                      color: Color.fromARGB(255, 121, 121, 121),
+                    ElevatedButton(
+                      onPressed: _submitForm,
+                      child: const Text('Сохранить'),
                     ),
-                  ),
-                  focusedBorder: OutlineInputBorder(
-                    borderSide: BorderSide(
-                      color: Color.fromARGB(255, 54, 54, 54),
-                    ),
-                  ),
-                  hintText: "Введите время засыпания",
+                  ],
                 ),
               ),
             ],
